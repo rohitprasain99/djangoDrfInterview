@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,18 @@ DATABASES = {
     }
 }
 
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
+
+        "USER": "postgres",
+        "PASSWORD": "p0stgres",
+
+        "NAME": "djangoDrfInterview",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
