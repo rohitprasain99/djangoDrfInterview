@@ -1,9 +1,8 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate
 
+from rest_framework_simplejwt.tokens import RefreshToken
 from users.serializer import UsersSerializer, LoginSerializer  
 
 @api_view(['POST'])
@@ -31,10 +30,21 @@ def login_user(request):
 
     # print(">>>>>>>>>", serializer.validated_data)
     user = serializer.validated_data['user']
-    print("into token >>>>>>>>", serializer.validated_data)
     tokens = serializer.create_tokens(user)
+
     return Response({"data" : {
         "access_token": tokens['access'],
         "refresh_token": tokens['refresh'],
         "message" : "logged in successfully"}},
      status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def logout(request):
+    try:
+        refresh_token = request.data.get("refresh")
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({"message": "Token successfully blacklisted"}, status=200)
+    except Exception as e:
+            return Response({"error": str(e)}, status=400)

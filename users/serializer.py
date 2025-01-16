@@ -55,14 +55,14 @@ class LoginSerializer(serializers.Serializer):
     
     def create_tokens(self, user):
         user = Users.objects.get(email=user.email)
-
         refresh = RefreshToken.for_user(user)
+
         return {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }
 
-#utility function to check if user is authenticated
+# utility function to check if user is authenticated
 def is_authenticated(email, password):
     try:
         user = Users.objects.get(email=email)

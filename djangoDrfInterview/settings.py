@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'authentication',
     
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -120,8 +121,18 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+
+    # Ensures that refresh tokens are blacklisted after they are rotated
+    'BLACKLIST_AFTER_ROTATION': True, 
+
+    'UPDATE_ALGORITHM': 'HS256',
+
+    # Enable rotating refresh tokens to ensure the old token gets blacklisted
+    'ROTATE_REFRESH_TOKENS': True,  
+
+    # By default, it uses 'jti' (JWT ID) to track blacklisted tokens
+    'BLACKLIST_TOKEN_CLAIMS': ['jti'],  
+
 }
 
 
