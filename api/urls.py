@@ -1,9 +1,20 @@
-from authentication import views
+from authentication import views as authetication_views
 from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView
+)
+
+
 urlpatterns = [
-    path('register/', views.register_user, name='register_user'),
-    path('token/', views.login_user, name='login_user'),
-    path('profile/', views.user_profile, name='user_profile')
+    path('register/', authetication_views.register_user, name='register_user'),
+    path('token/', authetication_views.login_user, name='login_user'),
+    
+    # path('profile/', views.user_profile, name='user_profile')
+
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 '''
