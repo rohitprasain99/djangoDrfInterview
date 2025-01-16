@@ -1,9 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-
 from rest_framework_simplejwt.tokens import RefreshToken
-from users.serializer import UsersSerializer, LoginSerializer  
+
+
+from users.serializers import UsersSerializer
+from authentication.serializers import LoginSerializer  
 
 @api_view(['POST'])
 def register_user(request):
@@ -41,10 +43,32 @@ def login_user(request):
 
 @api_view(['POST'])
 def logout(request):
+    refresh_token = request.data.get('refresh_token')
+
+    if not refresh_token:
+        return Response({'detail': 'Refresh token is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        refresh_token = request.data.get("refresh")
+        refresh_token = request.data.get("refresh_token")
         token = RefreshToken(refresh_token)
         token.blacklist()
-        return Response({"message": "Token successfully blacklisted"}, status=200)
+        return Response({"message": "Token successfully blacklisted"}, status=status.HTTP_200_OK)
     except Exception as e:
-            return Response({"error": str(e)}, status=400)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def generate_new_access_token(request):
+    refresh_token = request.data.get('refresh_token')
+
+    if not refresh_token:
+        return Response({'detail': 'Refresh token is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        return Response({
+            'access_token': str(refresh.access_token)
+        })
+
+    except Exception as e:
+        return Response({'detail': 'Invalid or expired refresh token.'}, status=status.HTTP_400_BAD_REQUEST)
