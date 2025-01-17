@@ -9,10 +9,10 @@ from users.models import Users
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ['id', 'email', 'password', 'refresh_token']
+        fields = ['id', 'email', 'password']
 
         #read only fields are included in the response but cannot be modified or updated.
-        read_only_fields = ['id', 'refresh_token'] 
+        read_only_fields = ['id'] 
         extra_kwargs = {
             'password': {'write_only': True} # not included in the response
         }

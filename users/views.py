@@ -7,7 +7,6 @@ from rest_framework.response import Response
 @api_view(['GET'])
 @permission_classes([IsAuthenticated]) 
 def user_profile(request):
-    print(request.user.id)
     return Response({
                 'data': "ok"
         }) 

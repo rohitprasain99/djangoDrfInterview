@@ -1,21 +1,28 @@
 from rest_framework.decorators import api_view
+from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-
-
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.timezone import now
+from utils.otp import generate_otp, is_valid_otp
 from users.serializers import UsersSerializer,EmailSerializer
 from authentication.serializers import LoginSerializer  
-from utils.otp import generate_otp
+from otp.serializers import OtpSerializer,VerifyOtpSerializer
+from otp.models import Otp
+from users.models import Users
+
+otp_expiration_min = 5
+
 @api_view(['POST'])
 def register_user(request):
-
     serializer = UsersSerializer(data = request.data)
 
     if not serializer.is_valid():
         return Response({"message":"error while registration", "errors" : serializer.errors},status=status.HTTP_400_BAD_REQUEST)
-    
     serializer.save()
+
     return Response({"data" : {
         "email": serializer.data['email']
     }, "message"  : "user registered successfully"}, status=status.HTTP_201_CREATED)
@@ -23,14 +30,11 @@ def register_user(request):
 
 @api_view(['POST'])
 def login_user(request):
-    
     serializer = LoginSerializer(data=request.data)
     
     if not serializer.is_valid():
-        print(serializer.errors)
-        return Response({"message":"invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"invalid email or password", "errors":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    # print(">>>>>>>>>", serializer.validated_data)
     user = serializer.validated_data['user']
     tokens = serializer.create_tokens(user)
 
@@ -87,25 +91,78 @@ def forget_password(request):
 
     # check if email is correct
     serialized_email = EmailSerializer(data = {"email":email})  # always accept dictionary
-
     if not serialized_email.is_valid():
-            return Response({"errors":serialized_email.errors}, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response({"errors":serialized_email.errors}, status=status.HTTP_400_BAD_REQUEST)
     valid_email = serialized_email.validated_data['email']
 
     #set expiration time (e.g., 5 minutes)
-    otp = generate_otp(5) 
+    otp = generate_otp(otp_expiration_min) 
 
-        
+    # save OTP and email to db
+    serialized_otp = OtpSerializer(data = {
+        "email":valid_email, 
+        "otp":otp['otp_code'],
+        "expires_at":otp['expires_at']
+        })
+    if not serialized_otp.is_valid():
+        return Response({"errors":serialized_otp.errors}, status=status.HTTP_400_BAD_REQUEST)
+    serialized_otp.save()
+    
+    # TODO
+    # try:
+    #     subject = 'Your OTP Code'
+    #     message = f'Your OTP code is: {otp['otp_code']}. Please use it to reset your password.'
+    #     email_from = settings.EMAIL_HOST_USER
+    #     recipient_list = [email]
+    #     send_mail(subject, message, email_from, recipient_list)
+
+    # except Exception as e:
+    #     return Response({"message":"Could not send email", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+   
     return Response({
-        "message": "please check mail for OTP code",
-        "email"  : valid_email,
-        "otp": otp
+        "message": "please check mail for OTP code. It expires in 1 minute",
+        "otp": otp['otp_code']
     },status = status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-def change_password(request):
-    pass
+def new_password_otp(request):
+    otp = request.data['otp']
+    new_password = request.data['new_password']
+
+    if not otp and not new_password:
+        return Response({"error": "OTP and new password are required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        otp_record = Otp.objects.get(otp = otp)
+        otp_email = otp_record.email
+        otp_expires_at = otp_record.expires_at
+        if not otp_email and otp_expires_at:
+            raise Exception("Not a valid OTP")
+        
+        if not is_valid_otp(otp_expires_at=otp_expires_at, expiry_minute = otp_expiration_min ):
+            raise Exception("The OTP has expired.")
+
+        # if otp_expires_at < now():
+        #     raise Exception("The OTP has expired.")
+        
+        user = Users.objects.get(email=otp_email)
+        if not user:
+            raise Exception("Not a valid OTP")
+        
+        #hash new password and save user, set_password already hashes the password string, not need to hash again
+        user.set_password(new_password)
+        user.save()
+
+        #delete OTP
+        otp_record.delete()
+
+        return Response({
+            "message": "Password changed successfully"
+        }, status= status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"message":"Could not change password", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 

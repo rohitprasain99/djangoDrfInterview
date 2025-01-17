@@ -7,9 +7,11 @@ def generate_otp(expiry_minute):
     expiration_time = now() + timedelta(minutes=expiry_minute)  
 
     return {
-        'otp': otp,
+        'otp_code': otp,
         'expires_at' : expiration_time
     }
 
-def is_valid_otp():
-    pass
+def is_valid_otp(otp_expires_at, expiry_minute):
+    if otp_expires_at + timedelta(minutes=expiry_minute)  < now():
+        return False
+    return True

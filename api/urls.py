@@ -16,11 +16,9 @@ urlpatterns = [
     path('profile/', user_views.user_profile, name='user_profile'),
 
     path('forget_password/',  authetication_views.forget_password, name = 'forget_password'),
-    path('change_password/',  authetication_views.change_password, name = 'change_password'),
+    path('new_password_otp/', authetication_views.new_password_otp, name = 'change_password_otp'),
 
-
-
-
+    # path('change_password/',  authetication_views.change_password, name = 'change_password'),
 
     # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

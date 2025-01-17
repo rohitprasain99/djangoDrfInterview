@@ -16,7 +16,6 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Both email and password are required.")
 
         user = is_authenticated(email, password)
-
         if not user:
             raise serializers.ValidationError("Invalid email or password.")
 
@@ -36,7 +35,6 @@ class LoginSerializer(serializers.Serializer):
 def is_authenticated(email, password):
     try:
         user = Users.objects.get(email=email)
-    
         if check_password(password, user.password):
             return user
         
