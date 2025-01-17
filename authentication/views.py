@@ -1,17 +1,20 @@
 from rest_framework.decorators import api_view
-from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils.timezone import now
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from utils.otp import generate_otp, is_valid_otp
 from users.serializers import UsersSerializer,EmailSerializer
 from authentication.serializers import LoginSerializer  
-from otp.serializers import OtpSerializer,VerifyOtpSerializer
+from otp.serializers import OtpSerializer
 from otp.models import Otp
 from users.models import Users
+
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.timezone import now
 
 otp_expiration_min = 5
 
@@ -88,7 +91,6 @@ def forget_password(request):
             "message":"email is required"
         })
     
-
     # check if email is correct
     serialized_email = EmailSerializer(data = {"email":email})  # always accept dictionary
     if not serialized_email.is_valid():
@@ -142,10 +144,7 @@ def new_password_otp(request):
         
         if not is_valid_otp(otp_expires_at=otp_expires_at, expiry_minute = otp_expiration_min ):
             raise Exception("The OTP has expired.")
-
-        # if otp_expires_at < now():
-        #     raise Exception("The OTP has expired.")
-        
+      
         user = Users.objects.get(email=otp_email)
         if not user:
             raise Exception("Not a valid OTP")
@@ -165,4 +164,27 @@ def new_password_otp(request):
         return Response({"message":"Could not change password", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated]) 
+def change_password(request):
+    print(request.user.id)
+    user_id = request.user.id
+    new_password = request.data['new_password']
 
+    if not new_password:
+        return Response({"message":"New password required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = Users.objects.get(id=user_id)
+        if not user:
+            raise Exception("User not found")
+            
+        user.set_password(new_password)
+        user.save()
+
+        return Response({
+            'message': "Password updated successfully",
+        },status=status.HTTP_200_OK) 
+    
+    except Exception as e:
+        return Response({"message":"Could not change password", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)
