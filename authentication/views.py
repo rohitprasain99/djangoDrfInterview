@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.hashers import check_password
 
 from utils.otp import generate_otp, is_valid_otp
 from users.serializers import UsersSerializer,EmailSerializer
@@ -11,6 +12,7 @@ from authentication.serializers import LoginSerializer
 from otp.serializers import OtpSerializer
 from otp.models import Otp
 from users.models import Users
+
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -167,18 +169,23 @@ def new_password_otp(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) 
 def change_password(request):
-    print(request.user.id)
-    user_id = request.user.id
-    new_password = request.data['new_password']
-
-    if not new_password:
-        return Response({"message":"New password required"}, status=status.HTTP_400_BAD_REQUEST)
-    
+    # print(request.user.password)
     try:
-        user = Users.objects.get(id=user_id)
-        if not user:
-            raise Exception("User not found")
-            
+        user = request.user
+        current_password = request.data['current_password']
+        new_password = request.data['new_password']
+
+        if not current_password:
+            return Response({"message":"Current password required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not new_password:
+            return Response({"message":"New password required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #check the current password with password from db
+        is_valid_password = check_password(current_password, user.password)
+        if not is_valid_password:
+            return Response({"message":"Incorrect current password"}, status=status.HTTP_400_BAD_REQUEST)
+
         user.set_password(new_password)
         user.save()
 
