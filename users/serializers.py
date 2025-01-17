@@ -34,3 +34,10 @@ class UsersSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        if not Users.objects.filter(email = value).exists():
+            raise serializers.ValidationError("User with email not found")
+        return value  

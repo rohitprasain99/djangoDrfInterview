@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from users.serializers import UsersSerializer
+from users.serializers import UsersSerializer,EmailSerializer
 from authentication.serializers import LoginSerializer  
 from utils.otp import generate_otp
 @api_view(['POST'])
@@ -75,16 +75,31 @@ def generate_new_access_token(request):
         return Response({'detail': 'Invalid or expired refresh token.'}, status=status.HTTP_400_BAD_REQUEST)
     
 
-@api_view(['POST'])
+@api_view(['GET'])
 def forget_password(request):
     email = request.data.get('email')
-    # check if email is correct
-    # send opt in email
-    otp = generate_otp()
+
+    if not email:
+        return Response({
+            "message":"email is required"
+        })
     
+
+    # check if email is correct
+    serialized_email = EmailSerializer(data = {"email":email})  # always accept dictionary
+
+    if not serialized_email.is_valid():
+            return Response({"errors":serialized_email.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    valid_email = serialized_email.validated_data['email']
+
+    #set expiration time (e.g., 5 minutes)
+    otp = generate_otp(5) 
+
+        
     return Response({
-        "message": "please check mail for OPT code",
-        "email"  : email,
+        "message": "please check mail for OTP code",
+        "email"  : valid_email,
         "otp": otp
     },status = status.HTTP_200_OK)
 
