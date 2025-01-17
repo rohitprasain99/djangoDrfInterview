@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'authentication',
+    'otp',
     
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',

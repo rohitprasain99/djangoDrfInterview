@@ -15,6 +15,13 @@ urlpatterns = [
     path('token/refresh/', authetication_views.generate_new_access_token, name='refresh_token'),
     path('profile/', user_views.user_profile, name='user_profile'),
 
+    path('forget_password/',  authetication_views.forget_password, name = 'forget_password'),
+    path('change_password/',  authetication_views.change_password, name = 'change_password'),
+
+
+
+
+
     # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

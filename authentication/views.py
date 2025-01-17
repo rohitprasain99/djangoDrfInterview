@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.serializers import UsersSerializer
 from authentication.serializers import LoginSerializer  
-
+from utils.otp import generate_otp
 @api_view(['POST'])
 def register_user(request):
 
@@ -59,6 +59,7 @@ def logout(request):
 
 @api_view(['GET'])
 def generate_new_access_token(request):
+
     refresh_token = request.data.get('refresh_token')
 
     if not refresh_token:
@@ -72,3 +73,24 @@ def generate_new_access_token(request):
 
     except Exception as e:
         return Response({'detail': 'Invalid or expired refresh token.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['POST'])
+def forget_password(request):
+    email = request.data.get('email')
+    # check if email is correct
+    # send opt in email
+    otp = generate_otp()
+    
+    return Response({
+        "message": "please check mail for OPT code",
+        "email"  : email,
+        "otp": otp
+    },status = status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def change_password(request):
+    pass
+
+

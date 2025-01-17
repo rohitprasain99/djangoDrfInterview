@@ -44,3 +44,16 @@ def is_authenticated(email, password):
     
     except Users.DoesNotExist:
         return None
+
+
+'''
+When to Use ModelSerializer:
+    - You have a Django model that you want to serialize and either create or update instances.
+    - You want automatic handling for model validation, field definitions, and save operations.
+    - You need to avoid repeating code and want a quick and simple approach for CRUD operations.
+
+When to Use Serializer:
+    - You are working with non-model data, like form data, data from external APIs, or any kind of custom data that does not map directly to a Django model.
+    - You need to implement custom validation and custom field definitions.
+    - You want more flexibility and control over the serialization process.
+'''
