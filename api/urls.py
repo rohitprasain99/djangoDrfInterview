@@ -1,7 +1,6 @@
 from authentication import views as authetication_views
 from user_details import views as user_profile_views
 
-from users import views as user_views
 from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,

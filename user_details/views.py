@@ -80,7 +80,7 @@ def update_user_profile(request):
         }, "message": "User profile updated successfully"}, status=status.HTTP_200_OK)
 
     except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
@@ -97,5 +97,5 @@ def delete_user_profile(request):
         return Response({ "message"  : "User detail deleted successfully"}, status=status.HTTP_201_CREATED)
         
     except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
   
