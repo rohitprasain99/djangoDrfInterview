@@ -18,7 +18,13 @@ def get_user_profile(request):
         
         serializer = UserDetailSerializer(user_detail)
         
-        return Response({"data" : serializer.data, "message"  : "User detail fetched successfully"}, status=status.HTTP_200_OK)
+        return Response({"data": {
+            "first_name": serializer.data['first_name'],
+            "last_name": serializer.data['last_name'],
+            "country": serializer.data['country'],
+            "contact": serializer.data['contact'],
+            "email" : serializer.data['user_info']['email']
+        }, "message": "User profile updated successfully"}, status=status.HTTP_200_OK)
     
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
