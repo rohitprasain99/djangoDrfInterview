@@ -51,6 +51,12 @@ Follow these steps to set up the project:
 
         pip install -r requirements.txt
 
+- Setup database credentials creating .env file:
+
+        DBUSER =
+        DBPASSWORD =
+        DBNAME =
+
 - Apply database migrations:
 
         python manage.py migrate
@@ -315,7 +321,7 @@ Response:
 
 # Contact
 
-For questions, contact:
+For questions or support, contact:
 
 Email: prasainrohit@gmail.com
 
