@@ -107,7 +107,7 @@ def forget_password(request):
             })
         
         # check if email is correct
-        serialized_email = EmailSerializer(data = {"email":email})  # always accept dictionary
+        serialized_email = EmailSerializer(data = {"email":email})  # always accepts dictionary
         if not serialized_email.is_valid():
             return Response({"errors":serialized_email.errors}, status=status.HTTP_400_BAD_REQUEST)
         valid_email = serialized_email.validated_data['email']
@@ -166,8 +166,8 @@ def new_password_otp(request):
         if not user:
             raise Exception("Not a valid OTP")
         
-        #hash new password and save user, 
-        #set_password already hashes the password string, not need to hash again
+        # hash new password and save user, 
+        # set_password already hashes the password string, not need to hash again
         user.set_password(new_password)
         user.save()
 
@@ -185,7 +185,6 @@ def new_password_otp(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) 
 def change_password(request):
-    # print(request.user.password)
     try:
         user = request.user
         current_password = request.data['current_password']

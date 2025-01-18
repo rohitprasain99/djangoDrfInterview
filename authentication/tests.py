@@ -1,15 +1,14 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework import status
-from authentication.views import register_user  # Update the import path as needed
-from authentication.serializers import UsersSerializer  # Update the serializer name/path
+from authentication.views import register_user 
+from authentication.serializers import UsersSerializer
 class RegisterUserTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.url = '/register/'
 
     def test_register_user_success(self):
-        # Prepare the payload with only email and password
         payload = {
             "email": "testuser@example.com",
             "password": "securepassword"

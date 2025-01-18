@@ -64,7 +64,9 @@ def update_user_profile(request):
         if not user_detail:
              raise Exception("User profile not found")
         
-        # Create a serializer with the existing instance, passing partial=True for partial updates
+        ''' Create a serializer with the existing instance, 
+            passing partial=True for partial updates
+        '''
         serializer = UserDetailSerializer(user_detail, data=request.data, partial=True)
 
         if not serializer.is_valid():

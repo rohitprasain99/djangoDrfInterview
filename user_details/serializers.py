@@ -12,5 +12,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
         # fields = '__all__'
-
         fields = ['id', 'first_name', 'last_name','country','contact','user', 'user_info']

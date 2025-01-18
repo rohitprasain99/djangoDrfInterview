@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
 import uuid
-
-# Create your models here.
 class Otp(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=False)
 
