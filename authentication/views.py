@@ -151,7 +151,8 @@ def new_password_otp(request):
         if not user:
             raise Exception("Not a valid OTP")
         
-        #hash new password and save user, set_password already hashes the password string, not need to hash again
+        #hash new password and save user, 
+        #set_password already hashes the password string, not need to hash again
         user.set_password(new_password)
         user.save()
 
@@ -194,4 +195,4 @@ def change_password(request):
         },status=status.HTTP_200_OK) 
     
     except Exception as e:
-        return Response({"message":"Could not change password", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"Could not change password", "errors": str(e)}, status=status.HTTP_400_BAD_REQUEST)  

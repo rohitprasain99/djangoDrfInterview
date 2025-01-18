@@ -1,4 +1,6 @@
 from authentication import views as authetication_views
+from user_details import views as user_profile_views
+
 from users import views as user_views
 from django.urls import path
 from rest_framework_simplejwt.views import (
@@ -17,7 +19,10 @@ urlpatterns = [
     path('new_password_otp/', authetication_views.new_password_otp, name = 'change_password_otp'),
     path('change_password/',  authetication_views.change_password, name = 'change_password'),
 
-    path('profile/', user_views.user_profile, name='user_profile'),
+    path('get_profile/', user_profile_views.get_user_profile, name='get_user_profile'),
+    path('create_profile/', user_profile_views.create_user_profile, name='create_user_profile'),
+    path('update_profile/', user_profile_views.update_user_profile, name='update_user_profile'),
+    path('delete_profile/', user_profile_views.delete_user_profile, name='delete_user_profile'),
 
     # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
